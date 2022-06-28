@@ -8,6 +8,7 @@ using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 
 #nullable disable
+
 namespace TestApp1
 {
     public class ExcelExport<T> where T : IExcelStruct
@@ -43,7 +44,7 @@ namespace TestApp1
         private void SetHeader()
         {
             var type = typeof(T);
-            var properties = type.GetProperties().OrderBy(x => x.GetCustomAttribute<ExcelColumnAttribute>().Index);
+            var properties = typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(ExcelColumnAttribute))).OrderBy(x => x.GetCustomAttribute<ExcelColumnAttribute>().Index);
 
             foreach (var property in properties)
             {
@@ -62,7 +63,7 @@ namespace TestApp1
             foreach (var item in _list)
             {
                 var row = _sheet.CreateRow(1 + _sheet.LastRowNum);
-                var properties = typeof(T).GetProperties().OrderBy(x => x.GetCustomAttribute<ExcelColumnAttribute>().Index);
+                var properties = typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(ExcelColumnAttribute))).OrderBy(x => x.GetCustomAttribute<ExcelColumnAttribute>().Index);
                 foreach (var property in properties)
                 {
                     var attr = property.GetCustomAttribute<ExcelColumnAttribute>();
@@ -77,10 +78,58 @@ namespace TestApp1
             }
         }
 
+        private void SetTemp()
+        {
+            var properties = typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(ExcelColumnAttribute))).OrderBy(x => x.GetCustomAttribute<ExcelColumnAttribute>().Index);
+            foreach (var property in properties)
+            {
+                var attr = property.GetCustomAttribute<ExcelColumnAttribute>();
+
+                if (attr.StructType == ExcelStructType.String)
+                {
+                    var row = _sheet.CreateRow(1 + _sheet.LastRowNum);
+                    var cell = row.CreateCell(attr.Index);
+                    cell.CellStyle = _contentStyle;
+                }
+
+                if (attr.StructType == ExcelStructType.DropList)
+                {
+                    SetCellDropdownList(_sheet, attr.Index, attr.Index, attr.DropList.Split(","));
+                }
+            }
+        }
+
+        public static void SetCellDropdownList(ISheet sheet, int firstcol, int lastcol, string[] vals)
+        {
+            //设置生成下拉框的行和列
+            var cellRegions = new CellRangeAddressList(1, 65535, firstcol, lastcol);
+
+            //设置 下拉框内容
+            DVConstraint constraint = DVConstraint.CreateExplicitListConstraint(vals);
+
+            //绑定下拉框和作用区域，并设置错误提示信息
+            HSSFDataValidation dataValidate = new HSSFDataValidation(cellRegions, constraint);
+            dataValidate.CreateErrorBox("输入不合法", "请输入或选择下拉列表中的值。");
+            dataValidate.ShowPromptBox = true;
+
+            sheet.AddValidationData(dataValidate);
+        }
+
         public void ToFile(string filePath)
         {
             SetHeader();
             SetBody();
+
+            using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                _workbook.Write(fs);
+            }
+        }
+
+        public void ToTemp(string filePath)
+        {
+            SetHeader();
+            SetTemp();
 
             using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
             {

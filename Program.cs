@@ -22,7 +22,7 @@ using TestApp1;
 // {data_bool.GetType().Name}"); Console.WriteLine($"{data_bool2} {data_bool2.GetType().Name}");
 // Console.WriteLine($"{data_bool3} {data_bool3.GetType().Name}");
 
-var rootPath = "E:/Demos/Test/TestApp1";
+var rootPath = "E:/Demos/Test/TestApp1/Power.NpioExcel.Demos";
 //var filePath = "E:/Demos/Test/TestApp1/20220527025949.xlsx";
 //var excel = new ExcelImport(filePath);
 //var data = excel.ToList<User>();
@@ -34,7 +34,7 @@ var rootPath = "E:/Demos/Test/TestApp1";
 //}
 //Console.WriteLine($"Error Lines : {string.Join(",", excel.Errors)}");
 
-//var outPath = $"{rootPath}/{DateTime.Now.ToString("yyyyMMddhhmmss")}.xlsx";
+var outPath = $"{rootPath}/{DateTime.Now.ToString("yyyyMMddhhmmss")}.xlsx";
 
 //var outData = new List<OutUser>
 //{
@@ -70,35 +70,37 @@ var rootPath = "E:/Demos/Test/TestApp1";
 
 //new ExcelExport<OutUser>().Export(outData).ToFile(outPath);
 
-Stopwatch stopwatch = new Stopwatch();
+//Stopwatch stopwatch = new Stopwatch();
 
-var filePath = "E:/Demos/Test/TestApp1/20220602030849.xlsx"; // 65535条数据
-//var excel = new ExcelImport(filePath);
-//var data = excel.ToList<User>();
+//var filePath = "E:/Demos/Test/TestApp1/Power.NpioExcel.Demos/20220602030849.xlsx"; // 65535条数据
+////var excel = new ExcelImport(filePath);
+////var data = excel.ToList<User>();
 
-stopwatch.Start();
-var excel1 = new ExcelImport(filePath);
-foreach (var data in excel1.ToListAwait<User>())
-{
-    //// data 为 500 条数据
-    //Console.WriteLine($"姓名\t年龄\t性别\t生日\t 条数:{data.Count}");
-    //foreach (var item in data)
-    //{
-    //    Console.WriteLine($"{item.Name}\t{item.Age}\t{item.Gender}\t{item.Born}");
-    //}
-    //Console.WriteLine($"Error Lines : {string.Join(",", excel.Errors)}");
-}
+//stopwatch.Start();
+//var excel1 = new ExcelImport(filePath);
+//foreach (var data in excel1.ToListAwait<User>())
+//{
+//    //// data 为 500 条数据
+//    //Console.WriteLine($"姓名\t年龄\t性别\t生日\t 条数:{data.Count}");
+//    //foreach (var item in data)
+//    //{
+//    //    Console.WriteLine($"{item.Name}\t{item.Age}\t{item.Gender}\t{item.Born}");
+//    //}
+//    //Console.WriteLine($"Error Lines : {string.Join(",", excel.Errors)}");
+//}
 
-stopwatch.Stop();
+//stopwatch.Stop();
 
-Console.WriteLine($"500条分批转换耗费时间: {stopwatch.Elapsed}");
+//Console.WriteLine($"500条分批转换耗费时间: {stopwatch.Elapsed}");
 
-stopwatch.Restart();
-var excel2 = new ExcelImport(filePath);
-var dt = excel2.ToList<User>();
+//stopwatch.Restart();
+//var excel2 = new ExcelImport(filePath);
+//var dt = excel2.ToList<User>();
 
-stopwatch.Stop();
+//stopwatch.Stop();
 
-Console.WriteLine($"直接转换耗费时间: {stopwatch.Elapsed}");
+//Console.WriteLine($"直接转换耗费时间: {stopwatch.Elapsed}");
 
-Console.ReadKey();
+//Console.ReadKey();
+
+new ExcelExport<OutUser>().Export(new List<OutUser>()).ToTemp(outPath);

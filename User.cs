@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace TestApp1
@@ -46,16 +47,27 @@ namespace TestApp1
 
     public class OutUser : IExcelStruct
     {
+        public OutUser()
+        {
+            var props = this.GetType().GetProperties();
+
+            var t = props.Where(x => x.GetCustomAttribute<ExcelColumnAttribute>().Index == 0).FirstOrDefault();
+            t.SetValue("DropList", "部门1,部门2,部门3");
+        }
+
         [ExcelColumn(Name = "姓名", Index = 0)]
         public string Name { get; set; } = null!;
 
         [ExcelColumn(Name = "年龄", Index = 1)]
         public int Age { get; set; }
 
-        [ExcelColumn(Name = "性别", Index = 2)]
+        [ExcelColumn(Name = "部门", Index = 2, StructType = ExcelStructType.DropList)]
+        public string Department { get; set; } = null!;
+
+        [ExcelColumn(Name = "性别", Index = 3)]
         public string Gender { get; set; } = null!;
 
-        [ExcelColumn(Name = "生日", Index = 3, Width = 30)]
+        [ExcelColumn(Name = "生日", Index = 4, Width = 30)]
         public DateTime Born { get; set; }
     }
 }
